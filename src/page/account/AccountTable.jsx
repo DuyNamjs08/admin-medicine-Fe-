@@ -30,11 +30,9 @@ const AccountTable = ({ data, mutate, refetch, refetchUser }) => {
                     {item.name}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-red-800 font-semibold">
-                    {
-                      Object.entries(UserEnums).find(
-                        ([_, value]) => value === item.role
-                      )[0]
-                    }
+                    {Object.entries(UserEnums).find(
+                      ([_, value]) => value === item.role
+                    )[0] ?? ""}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                     {format(new Date(item.createdAt), "dd-MM-yyyy")}
