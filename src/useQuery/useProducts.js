@@ -1,14 +1,13 @@
 import axios from "axios";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { getHeaders, handleError } from "../helpers/getHeaders";
+import { defaultLimit } from "../configUrl /configPagnigate";
 
-const fetchData = async (id) => {
+const fetchData = async (query) => {
   const headers = getHeaders("json");
   try {
     const result = await axios.get(`${import.meta.env.VITE_BASE_URL}/product`, {
-      params: {
-        categoryId: id,
-      },
+      params: query,
       headers,
     });
     return result.data;
@@ -22,7 +21,51 @@ export const useProduct = (query) => {
     queryKey: ["product", query],
     queryFn: () => fetchData(query),
   });
-  return { data, isLoading, error, status, refetch };
+  return {
+    data,
+    isLoading,
+    error,
+    status,
+    refetch,
+    totalPage: data?.totalCount
+      ? Math.ceil(data.totalCount / defaultLimit.limit ?? 0)
+      : 0,
+  };
+};
+const fetchDataSearch = async (query) => {
+  const headers = getHeaders("json");
+  try {
+    if (query.productName) {
+      const result = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/product`,
+        {
+          params: query,
+          headers,
+        }
+      );
+      return result.data;
+    }
+    return [];
+  } catch (error) {
+    await handleError(error);
+    await fetchData();
+  }
+};
+export const useProductSearch = (query) => {
+  const { data, isLoading, error, status, refetch } = useQuery({
+    queryKey: ["product-search", query],
+    queryFn: () => fetchDataSearch(query),
+  });
+  return {
+    data,
+    isLoading,
+    error,
+    status,
+    refetch,
+    totalPage: data?.totalCount
+      ? Math.ceil(data.totalCount / defaultLimit.limit ?? 0)
+      : 0,
+  };
 };
 const fetchDataPost = async (data) => {
   const headers = getHeaders();

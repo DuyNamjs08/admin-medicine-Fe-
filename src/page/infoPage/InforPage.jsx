@@ -14,8 +14,11 @@ import FormInput from "../../components/form/FormInput";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { postSchema } from "./postSchema";
+import { useDispatch } from "react-redux";
+import { showMessageError, showMessageSuccesss } from "../../feature/homeSlice";
 
 const InforPage = () => {
+  const dispatch = useDispatch();
   const editor = useRef(null);
   const [content, setContent] = useState("");
   const {
@@ -62,10 +65,14 @@ const InforPage = () => {
           mutatePost(
             { ...data, description: content },
             {
-              onSuccess: () => {
+              onSuccess: async () => {
                 refetch();
                 setContent("");
-                reset();
+                await reset();
+                dispatch(showMessageSuccesss("Tạo thành công!"));
+              },
+              onError: () => {
+                dispatch(showMessageError("Tạo thất bại!"));
               },
             }
           );

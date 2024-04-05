@@ -13,17 +13,23 @@ import { useForm } from "react-hook-form";
 import { useLoginPost } from "../../useQuery/useLogin";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  resetMessage,
+  showMessageError,
+  showMessageSuccesss,
+} from "../../feature/homeSlice";
+import { useDispatch, useSelector } from "react-redux";
+import AlertCmp from "../../components/alert/Alert";
 
 const defaultTheme = createTheme();
 
 export default function Login() {
+  const type = useSelector((state) => state.home.type);
+  const showMess = useSelector((state) => state.home.showMess);
+  const message = useSelector((state) => state.home.message);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const {
-    register,
-    handleSubmit,
-    // formState: { errors },
-    reset,
-  } = useForm({
+  const { register, handleSubmit, reset } = useForm({
     resolver: zodResolver(loginSchema),
     mode: "onSubmit",
   });
@@ -40,70 +46,94 @@ export default function Login() {
     };
     cb();
   }, [data]);
+  useEffect(() => {
+    let timeoutId;
+    if (showMess) {
+      timeoutId = setTimeout(() => {
+        dispatch(resetMessage());
+      }, 3000);
+    }
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [showMess]);
   return (
-    <ThemeProvider theme={defaultTheme}>
-      <Container component="main" maxWidth="xs">
-        <CssBaseline />
-        <Box
-          sx={{
-            marginTop: 8,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Màn hình quản lý
-          </Typography>
+    <>
+      <ThemeProvider theme={defaultTheme}>
+        <Container component="main" maxWidth="xs">
+          <CssBaseline />
           <Box
-            component="form"
-            onSubmit={handleSubmit((data) => {
-              mutate(data, {
-                onSuccess: () => {
-                  reset();
-                },
-              });
-            })}
-            noValidate
-            sx={{ mt: 1 }}
+            sx={{
+              marginTop: 8,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
           >
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Nhập email"
-              name="email"
-              autoComplete="email"
-              autoFocus
-              {...register("mail")}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              {...register("password")}
-              name="password"
-              label="Nhập mật khẩu"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-            />
-
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
+            <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+              <LockOutlinedIcon />
+            </Avatar>
+            <Typography component="h1" variant="h5">
+              Màn hình quản lý
+            </Typography>
+            <Box
+              component="form"
+              onSubmit={handleSubmit((data) => {
+                mutate(data, {
+                  onSuccess: () => {
+                    dispatch(showMessageSuccesss("Đăng nhập thành công!"));
+                    reset();
+                  },
+                  onError: () => {
+                    dispatch(showMessageError("Đăng nhập thất bại!"));
+                  },
+                });
+              })}
+              noValidate
+              sx={{ mt: 1 }}
             >
-              Đăng nhập
-            </Button>
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="email"
+                label="Nhập email"
+                name="email"
+                autoComplete="email"
+                autoFocus
+                {...register("mail")}
+              />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                {...register("password")}
+                name="password"
+                label="Nhập mật khẩu"
+                type="password"
+                id="password"
+                autoComplete="current-password"
+              />
+
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+              >
+                Đăng nhập
+              </Button>
+            </Box>
           </Box>
-        </Box>
-      </Container>
-    </ThemeProvider>
+        </Container>
+      </ThemeProvider>
+      {showMess && (
+        <div className="z-[1000000]  fixed right-4 bottom-10">
+          <div className="w-[400px]">
+            <AlertCmp type={type} message={message} />
+          </div>
+        </div>
+      )}
+    </>
   );
 }

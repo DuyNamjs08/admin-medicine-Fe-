@@ -1,14 +1,16 @@
 import axios from "axios";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { getHeaders, handleError } from "../helpers/getHeaders";
+import { defaultLimit } from "../configUrl /configPagnigate";
 
-const fetchData = async () => {
+const fetchData = async (query) => {
   const headers = getHeaders();
 
   try {
     const result = await axios.get(
       `${import.meta.env.VITE_BASE_URL}/category`,
       {
+        params: query,
         headers,
       }
     );
@@ -17,6 +19,22 @@ const fetchData = async () => {
     await handleError(error);
     await fetchData();
   }
+};
+export const useCategory = (query) => {
+  const { data, isLoading, error, status, refetch } = useQuery({
+    queryKey: ["category", query],
+    queryFn: () => fetchData(query),
+  });
+  return {
+    data,
+    totalPage: data?.totalCount
+      ? Math.ceil(data.totalCount / defaultLimit.limit ?? 0)
+      : 0,
+    isLoading,
+    error,
+    status,
+    refetch,
+  };
 };
 const fetchDataPost = async (data) => {
   const headers = getHeaders();
@@ -33,13 +51,7 @@ const fetchDataPost = async (data) => {
     await handleError(error);
   }
 };
-export const useCategory = () => {
-  const { data, isLoading, error, status, refetch } = useQuery({
-    queryKey: ["category"],
-    queryFn: fetchData,
-  });
-  return { data, isLoading, error, status, refetch };
-};
+
 export const useCategoryPost = () => {
   const { mutate, status } = useMutation({
     mutationFn: fetchDataPost,

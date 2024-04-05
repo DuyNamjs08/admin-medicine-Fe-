@@ -2,9 +2,12 @@ import { Link } from "react-router-dom";
 import Button from "../../components/button/Button";
 import { format } from "date-fns";
 import { addDot } from "../../helpers/changeNumber";
+import { useDispatch } from "react-redux";
+import { showMessageError, showMessageSuccesss } from "../../feature/homeSlice";
 
 /* eslint-disable react/prop-types */
 const ProductTable = ({ data, mutate, refetch, dataCategory }) => {
+  const dispatch = useDispatch();
   return (
     <tbody className="divide-y divide-gray-200 ">
       {data && data?.length > 0
@@ -24,10 +27,11 @@ const ProductTable = ({ data, mutate, refetch, dataCategory }) => {
                   {addDot(item.price)} vnđ
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm  font-semibold text-blue-800 cursor-pointer">
-                  {dataCategory &&
-                    dataCategory.find(
-                      (category) => category._id === item.category_id
-                    ).name}
+                  {dataCategory
+                    ? dataCategory.find(
+                        (category) => category._id === item.category_id
+                      )?.name
+                    : ""}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                   {format(new Date(item.createdAt), "dd-MM-yyyy")}
@@ -52,7 +56,11 @@ const ProductTable = ({ data, mutate, refetch, dataCategory }) => {
                         },
                         {
                           onSuccess: () => {
+                            dispatch(showMessageSuccesss("Xóa thành công!"));
                             refetch();
+                          },
+                          onError: () => {
+                            dispatch(showMessageError("Xóa thất bại!"));
                           },
                         }
                       );

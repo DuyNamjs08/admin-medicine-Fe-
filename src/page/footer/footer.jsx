@@ -7,8 +7,11 @@ import { CommonLoadingModal } from "../../components/model/LoadingModel";
 import { useFooter, useFooterUpdate } from "../../useQuery/useFooter";
 import { useEffect, useState } from "react";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
+import { showMessageError, showMessageSuccesss } from "../../feature/homeSlice";
+import { useDispatch } from "react-redux";
 
 const Footer = () => {
+  const dispatch = useDispatch();
   const {
     register,
     handleSubmit,
@@ -156,7 +159,11 @@ const Footer = () => {
         onClick={handleSubmit((data) => {
           mutate(data, {
             onSuccess: () => {
+              dispatch(showMessageSuccesss("Chỉnh sửa thành công!"));
               refetch();
+            },
+            onError: () => {
+              dispatch(showMessageError("Chỉnh sửa thất bại!"));
             },
           });
           reset();

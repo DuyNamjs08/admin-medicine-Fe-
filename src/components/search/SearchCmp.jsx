@@ -1,7 +1,13 @@
 /* eslint-disable react/prop-types */
 import { FaSearch } from "react-icons/fa";
 
-const SearchCmp = ({ text = "Tìm kiếm sản phẩm", component = false }) => {
+const SearchCmp = ({
+  text = "Tìm kiếm sản phẩm",
+  component = false,
+  onClick,
+  value,
+  setValue,
+}) => {
   return (
     <form
       className={`${
@@ -10,12 +16,14 @@ const SearchCmp = ({ text = "Tìm kiếm sản phẩm", component = false }) => 
     >
       <div className="relative">
         <div
-          onClick={() => alert("namdz")}
+          onClick={onClick}
           className="cursor-pointer z-10 absolute end-[15px] bottom-[10px] flex items-center text-black"
         >
           <FaSearch />
         </div>
         <input
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
           type="text"
           className={`${
             component ? "rounded-[8px] w-full" : "rounded-full w-full"

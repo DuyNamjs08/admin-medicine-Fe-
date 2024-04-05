@@ -8,6 +8,7 @@ const DON_HANG = "/don-hang";
 const CHAN_TRANG = "/chan-trang";
 const DANH_MUC = "/danh-muc";
 const TAI_KHOAN = "/tai-khoan";
+const GIAO_DICH = "/giao-dich";
 
 const RouterWeb = [
   {
@@ -17,10 +18,40 @@ const RouterWeb = [
     component: <Pages.MapPage />,
   },
   {
+    id: 414316,
+    path: GIAO_DICH,
+    role: ["1", "2", "3"],
+    component: <Pages.TransacOulet />,
+    child: [
+      {
+        path: "",
+        component: <Pages.TransacPage />,
+      },
+      {
+        path: ":id",
+        component: <Pages.TransacDetail />,
+      },
+    ],
+  },
+  {
     id: 414312,
     path: TAI_KHOAN,
     role: ["1", "2", "3"],
-    component: <Pages.AccountPage />,
+    component: <Pages.AccountOutlet />,
+    child: [
+      {
+        path: "",
+        component: <Pages.AccountPage />,
+      },
+      {
+        path: "tao-tai-khoan",
+        component: <Pages.AccountCreate />,
+      },
+      {
+        path: ":id",
+        component: <Pages.AccountDetails />,
+      },
+    ],
   },
   {
     id: 2,

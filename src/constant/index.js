@@ -5,6 +5,7 @@ import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import ContactPageIcon from "@mui/icons-material/ContactPage";
 import HeadsetIcon from "@mui/icons-material/Headset";
 import HandymanIcon from "@mui/icons-material/Handyman";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import BreakfastDiningIcon from "@mui/icons-material/BreakfastDining";
 import PersonIcon from "@mui/icons-material/Person";
 import { FcShipped, FcAssistant, FcSearch } from "react-icons/fc";
@@ -90,6 +91,7 @@ export const sideBarData = [
   { id: 99, title: "Danh mục", path: "/danh-muc", icon: BreakfastDiningIcon },
   { id: 3, title: "Sản phẩm", path: "/san-pham", icon: ShoppingBasketIcon },
   { id: 4, title: "Đơn hàng", path: "/don-hang", icon: ShoppingCartIcon },
+  { id: 49, title: "Giao dịch", path: "/giao-dich", icon: LocalShippingIcon },
   { id: 213, title: "Tin tức", path: "/tin-tuc", icon: ChatBubbleOutlineIcon },
   { id: 44, title: "Giới thiệu", path: "/gioi-thieu", icon: HeadsetIcon },
   { id: 5, title: "Liên hệ", path: "/lien-he", icon: ContactPageIcon },

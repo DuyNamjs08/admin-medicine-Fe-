@@ -7,8 +7,12 @@ import { useEffect, useState } from "react";
 import { useCategoryPost } from "../../useQuery/useCategory";
 import { CommonLoadingModal } from "../../components/model/LoadingModel";
 import { useNavigate } from "react-router-dom";
+import { createFormData } from "../../helpers/creatFormData";
+import { showMessageError, showMessageSuccesss } from "../../feature/homeSlice";
+import { useDispatch } from "react-redux";
 
 const CategoryCreate = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const {
     register,
@@ -34,15 +38,19 @@ const CategoryCreate = () => {
     <>
       <div className="text-[20px] font-bold ml-5">Màn hình tạo thư mục </div>
       <form
-        onSubmit={handleSubmit(async (data) => {
+        onSubmit={handleSubmit(async (dataForm) => {
           if (file) {
-            const formData = new FormData();
-            formData.append("image", file[0]);
-            formData.append("name", data.name);
-            formData.append("description", data.description);
-            mutate(formData, {
+            const result = createFormData({
+              ...dataForm,
+              image: file[0],
+            });
+            mutate(result, {
               onSuccess: () => {
                 navigate("/danh-muc");
+                dispatch(showMessageSuccesss("Tạo thành công!"));
+              },
+              onError: () => {
+                dispatch(showMessageError("Tạo thất bại!"));
               },
             });
             reset();

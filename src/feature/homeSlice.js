@@ -1,35 +1,34 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  value: 0,
+  showMess: false,
+  message: "",
+  type: "",
 };
-export const fetchUserById = createAsyncThunk(
-  "users/fetchByIdStatus",
-  async () => {
-    const response = await axios.get(
-      "https://jsonplaceholder.typicode.com/posts"
-    );
-    return response.data;
-  }
-);
 
 export const counterSlice = createSlice({
   name: "counter",
   initialState,
   reducers: {
-    increment: (state) => {
-      state.value += 1;
+    showMessageSuccesss: (state, action) => {
+      state.showMess = true;
+      state.message = action.payload;
+      state.type = "success";
     },
-    decrement: (state) => {
-      state.value -= 1;
+    showMessageError: (state, action) => {
+      state.showMess = true;
+      state.message = action.payload;
+      state.type = "error";
     },
-    incrementByAmount: (state, action) => {
-      state.value += action.payload;
+
+    resetMessage: (state) => {
+      state.showMess = false;
+      state.message = "";
     },
   },
 });
 
-export const { increment, decrement, incrementByAmount } = counterSlice.actions;
+export const { showMessageSuccesss, showMessageError, resetMessage } =
+  counterSlice.actions;
 
 export default counterSlice.reducer;

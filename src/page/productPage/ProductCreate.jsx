@@ -13,6 +13,8 @@ import UploadFileIcon from "@mui/icons-material/UploadFile";
 import { useProductPost } from "../../useQuery/useProducts";
 import { createFormData } from "../../helpers/creatFormData";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { showMessageError, showMessageSuccesss } from "../../feature/homeSlice";
 
 const PromoteData = [
   { label: "Theo giá tiền", value: "fixed" },
@@ -23,6 +25,7 @@ const colorData = [
   { label: "Có màu", value: "1" },
 ];
 const ProductCreate = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const {
     register,
@@ -55,15 +58,19 @@ const ProductCreate = () => {
       <button
         type="submit"
         onClick={handleSubmit(
-          (data) => {
+          (dataForm) => {
             if (file.length > 0) {
               const result = createFormData({
-                ...data,
+                ...dataForm,
                 "image[]": file,
               });
               mutate(result, {
                 onSuccess: () => {
+                  dispatch(showMessageSuccesss("Tạo thành công!"));
                   navigate("/san-pham");
+                },
+                onError: () => {
+                  dispatch(showMessageError("Tạo thất bại!"));
                 },
               });
               reset();
@@ -95,8 +102,8 @@ const ProductCreate = () => {
           />
           <FormSelectBox
             data={
-              data
-                ? data.map((item) => {
+              data?.data
+                ? data?.data?.map((item) => {
                     return { value: item._id, label: item.name };
                   })
                 : []

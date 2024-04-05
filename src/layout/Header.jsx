@@ -1,39 +1,42 @@
-/* eslint-disable no-unused-vars */
-
+/* eslint-disable react/prop-types */
 import { useState } from "react";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import SearchCmp from "../components/search/SearchCmp";
 import BadgeCmp from "../components/badge/BadgeCmp";
 import Avatar from "@mui/material/Avatar";
 import ModelAccount from "./model/ModelAccount";
 import { useOnOutsideClick } from "../hook/use-outside";
+import { useUserId } from "../useQuery/useUser";
+import { CommonLoadingModal } from "../components/model/LoadingModel";
+import ModelSearch from "./model/ModelSearch";
+import { useProductSearch } from "../useQuery/useProducts";
 
-function Header() {
-  const [data, setData] = useState([]);
+function Header({ setShowNoti }) {
+  const [value, setValue] = useState("");
+  const [valueSearch, setValueSearch] = useState("");
   const [showModel, setShowModel] = useState(false);
   const [active, setActive] = useState(false);
-  const [scrollY, setScrollY] = useState(0);
-  const navigate = useNavigate();
-
+  const [showModelSearch, setShowModelSearch] = useState(false);
   useEffect(() => {
     setShowModel(false);
   }, [active]);
-  const [isFixed, setIsFixed] = useState(false);
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 80) {
-        setIsFixed(true);
-      } else {
-        setIsFixed(false);
-      }
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
   const { innerBorderRef } = useOnOutsideClick(() => setShowModel(false));
+  const { innerBorderRef: innerBorderRefSearch } = useOnOutsideClick(() =>
+    setShowModelSearch(false)
+  );
+
+  const { data: dataProduct, isLoading: isLoadingProduct } = useProductSearch({
+    offset: 0,
+    productName: valueSearch,
+  });
+  const { data, isLoading } = useUserId(localStorage.getItem("userId") ?? "");
+  const handleSearch = () => {
+    if (value) {
+      setShowModelSearch(true);
+      setValueSearch(value);
+    }
+  };
+
   return (
     <header>
       <nav className="bg-white border-[#0172bc] border-b-[1px]">
@@ -46,14 +49,25 @@ function Header() {
             <div className="md:w-auto md:mr-0"></div>
             <div className="flex items-center lg:order-2 flex-wrap justify-between w-full md:w-auto relative">
               <div className="flex gap-2 items-center">
-                <SearchCmp />
-                <BadgeCmp />
+                <SearchCmp
+                  onClick={handleSearch}
+                  value={value}
+                  setValue={setValue}
+                />
+                <div ref={innerBorderRefSearch}>
+                  {showModelSearch && (
+                    <ModelSearch data={dataProduct?.data ?? []} />
+                  )}
+                </div>
+                <div onClick={() => setShowNoti(true)}>
+                  <BadgeCmp />
+                </div>
                 <div
                   ref={innerBorderRef}
                   className="cursor-pointer"
                   onClick={() => setShowModel(true)}
                 >
-                  <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+                  <Avatar alt="Remy Sharp" src={data?.image} />
                   {showModel && (
                     <ModelAccount setActive={setActive} active={active} />
                   )}
@@ -65,6 +79,7 @@ function Header() {
           </div>
         </div>
       </nav>
+      <CommonLoadingModal isLoadingModalOpen={isLoading || isLoadingProduct} />
     </header>
   );
 }

@@ -8,8 +8,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { postSchema } from "./postSchema";
 import { useForm } from "react-hook-form";
 import FormInput from "../../components/form/FormInput";
+import { useDispatch } from "react-redux";
+import { showMessageError, showMessageSuccesss } from "../../feature/homeSlice";
 
 const PostDetails = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const editor = useRef(null);
@@ -58,11 +61,15 @@ const PostDetails = () => {
                 _id: location.pathname.split("/")[2],
               },
               {
-                onSuccess: () => {
+                onSuccess: async () => {
+                  dispatch(showMessageSuccesss("Chỉnh sửa thành công!"));
                   refetch();
                   setContent("");
                   setIsEdit(false);
-                  reset();
+                  await reset();
+                },
+                onError: () => {
+                  dispatch(showMessageError("Chỉnh sửa thất bại!"));
                 },
               }
             );

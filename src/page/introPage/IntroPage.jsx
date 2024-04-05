@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from "react";
 import JoditEditor from "jodit-react";
-// import HTMLReactParser from "html-react-parser";
 import FormInput from "../../components/form/FormInput";
 import { introSchema } from "./introSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,8 +8,11 @@ import UploadFileIcon from "@mui/icons-material/UploadFile";
 import { useIntro, useIntroUpdate } from "../../useQuery/useIntro";
 import { CommonLoadingModal } from "../../components/model/LoadingModel";
 import { createFormData } from "../../helpers/creatFormData";
+import { useDispatch } from "react-redux";
+import { showMessageError, showMessageSuccesss } from "../../feature/homeSlice";
 
 const IntroPage = () => {
+  const dispatch = useDispatch();
   const {
     register,
     handleSubmit,
@@ -88,7 +90,6 @@ const IntroPage = () => {
           onChange={(newContent) => setContent(newContent)}
         />
       </div>
-      {/* <div>{HTMLReactParser(content)}</div> */}
       <button
         onClick={handleSubmit((dataForm) => {
           const result = createFormData({
@@ -99,9 +100,13 @@ const IntroPage = () => {
           });
           mutate(result, {
             onSuccess: () => {
+              dispatch(showMessageSuccesss("Chỉnh sửa thành công!"));
               refetch();
               setFile("");
               setContent("");
+            },
+            onError: () => {
+              dispatch(showMessageError("Chỉnh sửa thất bại!"));
             },
           });
           reset();

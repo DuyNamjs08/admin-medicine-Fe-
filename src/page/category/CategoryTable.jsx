@@ -1,8 +1,12 @@
+import { useDispatch } from "react-redux";
 import Button from "../../components/button/Button";
 import { Link } from "react-router-dom";
+import { showMessageError, showMessageSuccesss } from "../../feature/homeSlice";
+import { format } from "date-fns";
 
 /* eslint-disable react/prop-types */
 const CategoryTable = ({ data, mutate, refetch }) => {
+  const dispatch = useDispatch();
   return (
     <>
       <tbody className="divide-y divide-gray-200 ">
@@ -20,7 +24,7 @@ const CategoryTable = ({ data, mutate, refetch }) => {
                     {item.name}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                    {item.createdAt}
+                    {format(new Date(item.createdAt), "dd-MM-yyyy")}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                     <img
@@ -42,7 +46,11 @@ const CategoryTable = ({ data, mutate, refetch }) => {
                           },
                           {
                             onSuccess: () => {
+                              dispatch(showMessageSuccesss("Xóa thành công!"));
                               refetch();
+                            },
+                            onError: () => {
+                              dispatch(showMessageError("Xóa thất bại!"));
                             },
                           }
                         );

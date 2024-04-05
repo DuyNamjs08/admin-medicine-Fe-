@@ -6,7 +6,6 @@ import OrderTable from "./orderTable";
 
 const OrderPage = () => {
   const { data, refetch } = useOrder();
-  console.log(data);
   return (
     <>
       <div className="text-xl font-semibold">Danh sách đơn hàng</div>
@@ -22,6 +21,9 @@ const OrderPage = () => {
               },
               {
                 label: "Mã order",
+              },
+              {
+                label: "Trạng thái ",
               },
               {
                 label: "Mã người dùng ",

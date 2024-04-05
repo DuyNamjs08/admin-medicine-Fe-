@@ -8,8 +8,11 @@ import { useEffect, useState } from "react";
 import { useContact, useContactUpdate } from "../../useQuery/useContact";
 import { CommonLoadingModal } from "../../components/model/LoadingModel";
 import { createFormData } from "../../helpers/creatFormData";
+import { showMessageError, showMessageSuccesss } from "../../feature/homeSlice";
+import { useDispatch } from "react-redux";
 
 const ContactPage = () => {
+  const dispatch = useDispatch();
   const {
     register,
     handleSubmit,
@@ -93,8 +96,12 @@ const ContactPage = () => {
               });
               mutate(result, {
                 onSuccess: () => {
+                  dispatch(showMessageSuccesss("Chỉnh sửa thành công!"));
                   refetch();
                   setFile("");
+                },
+                onError: () => {
+                  dispatch(showMessageError("Chỉnh sửa thất bại!"));
                 },
               });
               reset();

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import BannerCmp from "../../components/banner/BannerCmp";
 import CarouselCmp from "../../components/carousel/carouselCmp";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -21,6 +21,9 @@ import { useCategory } from "../../useQuery/useCategory";
 import { CommonLoadingModal } from "../../components/model/LoadingModel";
 import { createFormData } from "../../helpers/creatFormData";
 import { addDot } from "../../helpers/changeNumber";
+import { defaultLimit } from "../../configUrl /configPagnigate";
+import { showMessageError, showMessageSuccesss } from "../../feature/homeSlice";
+import { useDispatch } from "react-redux";
 const PromoteData = [
   { label: "Theo giá tiền", value: "fixed" },
   { label: "Theo phần trăm", value: "percentage" },
@@ -30,6 +33,8 @@ const colorData = [
   { label: "Có màu", value: "1" },
 ];
 const ProductDetail = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -51,7 +56,11 @@ const ProductDetail = () => {
   const [isLoadingMethod, setIsLoadingMethod] = useState(false);
   const { data, isLoading: isisLoadingCategory } = useCategory();
   const { data: dataListproduct, isLoading: isLoadingListproduct } = useProduct(
-    location.search.split("=")[1]
+    {
+      category_id: location.search.split("=")[1],
+      limit: defaultLimit.limit,
+      offset: 0,
+    }
   );
   const { mutate, status } = useProductUpdate();
   const handleDelete = (index) => {
@@ -96,8 +105,12 @@ const ProductDetail = () => {
               });
               mutate(result, {
                 onSuccess: () => {
+                  dispatch(showMessageSuccesss("Chỉnh sửa thành công!"));
                   setIsEdit(false);
                   refetch();
+                },
+                onError: () => {
+                  dispatch(showMessageError("Chỉnh sửa thất bại!"));
                 },
               });
               reset();
@@ -118,6 +131,13 @@ const ProductDetail = () => {
           Chỉnh sửa
         </button>
       )}
+      <button
+        onClick={() => navigate("/san-pham")}
+        type="submit"
+        className="text-white bg-yellow-500 hover:bg-yellow-600   font-medium rounded-lg text-sm px-5 py-2.5 text-center  ml-5 mt-6"
+      >
+        Quay lại
+      </button>
       {isEdit ? (
         <div className="flex gap-4 mt-6">
           <div className="w-1/3">
@@ -137,8 +157,8 @@ const ProductDetail = () => {
             />
             <FormSelectBox
               data={
-                data
-                  ? data.map((item) => {
+                data?.data
+                  ? data?.data?.map((item) => {
                       return { value: item._id, label: item.name };
                     })
                   : []
@@ -291,7 +311,7 @@ const ProductDetail = () => {
                 <p className="text-[14px] w-[200px] font-semibold">Danh mục:</p>
                 <p className="text-[14px] text-blue-700 ">
                   {dataProductId && data
-                    ? data.find(
+                    ? data?.data?.find(
                         (item) => item._id === dataProductId.category_id
                       )?.name
                     : ""}
@@ -336,7 +356,7 @@ const ProductDetail = () => {
       <div className="text-xl font-semibold my-6">Sản phẩm liên quan</div>
       <div>
         <CarouselCmp
-          dataProductHot={dataListproduct?.product ?? []}
+          dataProductHot={dataListproduct?.data ?? []}
           id={location.search.split("=")[1]}
         />
       </div>

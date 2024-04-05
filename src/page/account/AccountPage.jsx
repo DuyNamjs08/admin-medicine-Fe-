@@ -9,10 +9,28 @@ import FormInput from "../../components/form/FormInput";
 import FormTextarea from "../../components/form/FormTextarea";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import { useEffect, useState } from "react";
-import { useUserId, useUserUpdate } from "../../useQuery/useUser";
+import {
+  useUser,
+  useUserDelete,
+  useUserId,
+  useUserUpdate,
+} from "../../useQuery/useUser";
 import { CommonLoadingModal } from "../../components/model/LoadingModel";
 import { createFormData } from "../../helpers/creatFormData";
+import AccountTable from "./AccountTable";
+import { Table } from "../../components/table/Table";
+import { TableHeader } from "../../components/table/TableHeader";
+import { Pagination } from "@mui/material";
+import { usePaginate } from "../../hook/usePaginate";
+import { Link } from "react-router-dom";
+import Button from "../../components/button/Button";
+import FormRadio from "../../components/form/FormRadio";
+import { roleData } from "./AccountCreate";
+import { useDispatch } from "react-redux";
+import { showMessageError, showMessageSuccesss } from "../../feature/homeSlice";
 const AccountPage = () => {
+  const dispatch = useDispatch();
+  const { offset, page, handleChange, limit } = usePaginate();
   const {
     register,
     handleSubmit,
@@ -27,7 +45,18 @@ const AccountPage = () => {
   const { data, isLoading, refetch } = useUserId(
     localStorage.getItem("userId") ?? ""
   );
+  const {
+    data: dataListUser,
+    isLoading: isLoadingUser,
+    totalPage,
+    totalCount,
+    refetch: refetchUser,
+  } = useUser({
+    limit,
+    offset,
+  });
   const { mutate, status } = useUserUpdate();
+  const { mutate: mutateDelete, status: statusDelete } = useUserDelete();
   useEffect(() => {
     if (data) {
       setValue("name", data?.name || "");
@@ -36,16 +65,17 @@ const AccountPage = () => {
       setValue("phone", data?.phone || "");
       setValue("profession", data?.profession || "");
       setValue("description", data?.description || "");
+      setValue("role", data?.role || "");
     }
   }, [data]);
   const [isLoadingMethod, setIsLoadingMethod] = useState(false);
   useEffect(() => {
-    if (status === "pending") {
+    if (status === "pending" || statusDelete === "pending") {
       setIsLoadingMethod(true);
     } else {
       setIsLoadingMethod(false);
     }
-  }, [status]);
+  }, [status, statusDelete]);
   return (
     <>
       <div className="text-[28px] font-bold ml-5">
@@ -61,7 +91,10 @@ const AccountPage = () => {
             />
             <div className="mt-4 font-semibold text-[20px] text-[#3a589d]">
               Số lượng tài khoản đã tạo:{" "}
-              <span className="font-bold text-[22px] text-[#b7494a]"> 133</span>
+              <span className="font-bold text-[25px] text-[#b7494a]">
+                {" "}
+                {totalCount ?? 0}
+              </span>
             </div>
           </div>
           {/* thông tin */}
@@ -157,6 +190,11 @@ const AccountPage = () => {
                 register={register("profession")}
                 error={errors?.profession}
               />
+              <FormRadio
+                label={"Quyền"}
+                data={roleData}
+                register={register("role")}
+              />
               <div className="h-[120px]  border-[2px]  flex justify-center items-center border-dashed">
                 <label htmlFor="file-upload" className="flex items-center">
                   {" "}
@@ -197,6 +235,11 @@ const AccountPage = () => {
                 mutate(result, {
                   onSuccess: () => {
                     refetch();
+                    refetchUser();
+                    dispatch(showMessageSuccesss("Chỉnh sửa thành công!"));
+                  },
+                  onError: () => {
+                    dispatch(showMessageError("Chỉnh sửa thất bại!"));
                   },
                 });
                 reset();
@@ -208,7 +251,65 @@ const AccountPage = () => {
           </div>
         </div>
       </div>
-      <CommonLoadingModal isLoadingModalOpen={isLoading || isLoadingMethod} />
+      {/* phần table */}
+      <div>
+        <div className="text-xl font-semibold">Danh sách tài khoản</div>
+        <Link to={"/tai-khoan/tao-tai-khoan"}>
+          <Button text={"Thêm tài khoản"} className={"mt-4"} />
+        </Link>
+      </div>
+      <div className="mt-8">
+        <Table
+          tableHeader={
+            <TableHeader
+              headers={[
+                {
+                  label: "Số thứ tự",
+                },
+                {
+                  label: "id",
+                },
+                {
+                  label: "Tên",
+                },
+                {
+                  label: "Quyền",
+                },
+                {
+                  label: "Ngày tạo",
+                },
+                {
+                  label: "Image",
+                },
+                {
+                  label: "",
+                },
+              ]}
+            />
+          }
+          tableBody={
+            <AccountTable
+              data={dataListUser?.data}
+              mutate={mutateDelete}
+              refetch={refetch}
+              refetchUser={refetchUser}
+            />
+          }
+          isEmpty={dataListUser?.data?.length === 0}
+        />
+      </div>
+      <div className="mt-4 flex justify-center">
+        <Pagination
+          count={totalPage ?? 0}
+          page={page}
+          onChange={handleChange}
+          variant="outlined"
+          shape="rounded"
+        />
+      </div>
+      <CommonLoadingModal
+        isLoadingModalOpen={isLoading || isLoadingMethod || isLoadingUser}
+      />
     </>
   );
 };

@@ -7,7 +7,7 @@ const fetchDataMonth = async () => {
   const headers = getHeaders();
   try {
     const result = await axios.get(
-      `${import.meta.env.VITE_BASE_URL}/user-month`,
+      `${import.meta.env.VITE_BASE_URL}/transaction-month`,
       {
         headers,
       }
@@ -18,29 +18,33 @@ const fetchDataMonth = async () => {
     await fetchData();
   }
 };
-export const useUserMonth = () => {
+export const useTransactionMonth = () => {
   const { data, isLoading, error, status, refetch } = useQuery({
-    queryKey: ["user-month"],
+    queryKey: ["Transaction-month"],
     queryFn: fetchDataMonth,
   });
   return { data, isLoading, error, status, refetch };
 };
 const fetchData = async (query) => {
   const headers = getHeaders();
+
   try {
-    const result = await axios.get(`${import.meta.env.VITE_BASE_URL}/user`, {
-      params: query,
-      headers,
-    });
+    const result = await axios.get(
+      `${import.meta.env.VITE_BASE_URL}/transaction`,
+      {
+        params: query,
+        headers,
+      }
+    );
     return result.data;
   } catch (error) {
     await handleError(error);
     await fetchData();
   }
 };
-export const useUser = (query) => {
+export const useTransaction = (query) => {
   const { data, isLoading, error, status, refetch } = useQuery({
-    queryKey: ["user", query],
+    queryKey: ["Transaction", query],
     queryFn: () => fetchData(query),
   });
   return {
@@ -52,14 +56,13 @@ export const useUser = (query) => {
     totalPage: data?.totalCount
       ? Math.ceil(data.totalCount / defaultLimit.limit ?? 0)
       : 0,
-    totalCount: data?.totalCount ? data.totalCount : 0,
   };
 };
 const fetchDataPost = async (data) => {
   const headers = getHeaders();
   try {
     const result = await axios.post(
-      `${import.meta.env.VITE_BASE_URL}/create`,
+      `${import.meta.env.VITE_BASE_URL}/Transaction`,
       data,
       {
         headers,
@@ -71,7 +74,7 @@ const fetchDataPost = async (data) => {
   }
 };
 
-export const useUserPost = () => {
+export const useTransactionPost = () => {
   const { mutate, status } = useMutation({
     mutationFn: fetchDataPost,
     onSuccess: () => {},
@@ -82,7 +85,7 @@ const fetchDataDelete = async (data) => {
   const headers = getHeaders();
   try {
     const result = await axios.delete(
-      `${import.meta.env.VITE_BASE_URL}/userId`,
+      `${import.meta.env.VITE_BASE_URL}/TransactionId`,
       {
         headers,
         params: data,
@@ -94,7 +97,7 @@ const fetchDataDelete = async (data) => {
     await fetchData();
   }
 };
-export const useUserDelete = () => {
+export const useTransactionDelete = () => {
   const { mutate, status } = useMutation({
     mutationFn: fetchDataDelete,
     onSuccess: () => {},
@@ -105,28 +108,31 @@ const fetchDataId = async (id) => {
   const headers = getHeaders();
 
   try {
-    const result = await axios.get(`${import.meta.env.VITE_BASE_URL}/userId`, {
-      headers,
-      params: { _id: id },
-    });
+    const result = await axios.get(
+      `${import.meta.env.VITE_BASE_URL}/transactionId`,
+      {
+        headers,
+        params: { _id: id },
+      }
+    );
     return result.data;
   } catch (error) {
     await handleError(error);
     await fetchData();
   }
 };
-export const useUserId = (query) => {
+export const useTransactionId = (query) => {
   const { data, isLoading, error, status, refetch } = useQuery({
-    queryKey: ["user-id", query],
+    queryKey: ["Transaction"],
     queryFn: () => fetchDataId(query),
   });
   return { data, isLoading, error, status, refetch };
 };
 const fetchDataUpdate = async (data) => {
-  const headers = getHeaders();
+  const headers = getHeaders("json");
   try {
     const result = await axios.put(
-      `${import.meta.env.VITE_BASE_URL}/userId`,
+      `${import.meta.env.VITE_BASE_URL}/transactionId`,
       data,
       {
         headers,
@@ -137,7 +143,7 @@ const fetchDataUpdate = async (data) => {
     await handleError(error);
   }
 };
-export const useUserUpdate = () => {
+export const useTransactionUpdate = () => {
   const { mutate, status } = useMutation({
     mutationFn: fetchDataUpdate,
     onSuccess: () => {},

@@ -29,6 +29,13 @@ import Login from "./login/Login";
 import RegisterPage from "./registerPage/RegisterPage";
 // tài khoản
 import AccountPage from "./account/AccountPage";
+import AccountCreate from "./account/AccountCreate";
+import AccountDetails from "./account/AccountDetails";
+import AccountOutlet from "./account/AccountOutlet";
+// giao dich
+import TransacOulet from "./transaction/TransacOulet";
+import TransacPage from "./transaction/TransacPage";
+import TransacDetail from "./transaction/TransacDetail";
 
 export default {
   MapPage,
@@ -62,4 +69,11 @@ export default {
   RegisterPage,
   // tài khoản
   AccountPage,
+  AccountCreate,
+  AccountDetails,
+  AccountOutlet,
+  // giao dich
+  TransacOulet,
+  TransacPage,
+  TransacDetail,
 };

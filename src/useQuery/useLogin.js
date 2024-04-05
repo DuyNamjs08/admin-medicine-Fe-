@@ -14,9 +14,9 @@ const fetchDataPost = async (data) => {
   }
 };
 export const useLoginPost = () => {
-  const { mutate, status, data } = useMutation({
+  const { mutate, status, data, error } = useMutation({
     mutationFn: fetchDataPost,
     onSuccess: () => {},
   });
-  return { mutate, status, data };
+  return { mutate, status, data, error };
 };

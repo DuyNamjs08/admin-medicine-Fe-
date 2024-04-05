@@ -8,7 +8,7 @@ const Sidebar = () => {
   return (
     <div
       className="bg-[#1B3C73] text-white 
-           fixed top-0 left-0 w-[200px] z-[10000] h-[100vh] "
+           fixed top-0 left-0 w-[200px] z-[100] h-[100vh] "
     >
       <div className="h-[81px]  border-b-[1px] border-r-[1px] border-[grey] flex justify-center items-center">
         <img

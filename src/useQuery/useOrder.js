@@ -2,6 +2,28 @@ import axios from "axios";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { getHeaders, handleError } from "../helpers/getHeaders";
 
+const fetchDataMonth = async () => {
+  const headers = getHeaders();
+  try {
+    const result = await axios.get(
+      `${import.meta.env.VITE_BASE_URL}/order-month`,
+      {
+        headers,
+      }
+    );
+    return result.data;
+  } catch (error) {
+    await handleError(error);
+    await fetchData();
+  }
+};
+export const useOrderMonth = () => {
+  const { data, isLoading, error, status, refetch } = useQuery({
+    queryKey: ["order-month"],
+    queryFn: fetchDataMonth,
+  });
+  return { data, isLoading, error, status, refetch };
+};
 const fetchData = async () => {
   const headers = getHeaders();
 

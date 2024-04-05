@@ -8,11 +8,15 @@ import FormInput from "../../components/form/FormInput";
 import FormTextarea from "../../components/form/FormTextarea";
 import { CommonLoadingModal } from "../../components/model/LoadingModel";
 import CardHoriCmp from "../../components/cardHori/CardHoriCmp";
-import img from "../../assets/phamacy/1.webp";
-import Typography from "@mui/material/Typography";
 import Pagination from "@mui/material/Pagination";
+import { createFormData } from "../../helpers/creatFormData";
+import { useProduct } from "../../useQuery/useProducts";
+import { usePaginate } from "../../hook/usePaginate";
+import { useDispatch } from "react-redux";
+import { showMessageError, showMessageSuccesss } from "../../feature/homeSlice";
 
 const CategoryDetail = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const {
     register,
@@ -25,15 +29,20 @@ const CategoryDetail = () => {
     resolver: zodResolver(categorySchema),
     mode: "onSubmit",
   });
+  const { offset, page, handleChange, limit } = usePaginate();
   const [file, setFile] = useState("");
   const location = useLocation();
   const [isEdit, setIsEdit] = useState(false);
   const [isLoadingMethod, setIsLoadingMethod] = useState(false);
-  const [page, setPage] = useState(1);
-  const handleChange = (event, value) => {
-    setPage(value);
-  };
-
+  const {
+    data: dataListproduct,
+    isLoading: isLoadingListproduct,
+    totalPage,
+  } = useProduct({
+    category_id: location.pathname.split("/")[2],
+    limit,
+    offset,
+  });
   const { data, refetch } = useCategoryId(location.pathname.split("/")[2]);
   useEffect(() => {
     if (data) {
@@ -55,7 +64,7 @@ const CategoryDetail = () => {
         Màn hình danh mục chi tiết{" "}
       </div>
       <div className="block md:flex md:gap-4">
-        <div>
+        <div className="w-1/3">
           {isEdit ? (
             <>
               <form className="max-w-sm p-6">
@@ -125,16 +134,20 @@ const CategoryDetail = () => {
             <button
               onClick={handleSubmit(async (dataForm) => {
                 if (file && isEdit) {
-                  const formData = new FormData();
-                  formData.append("image", file[0]);
-                  formData.append("name", dataForm.name);
-                  formData.append("description", dataForm.description);
-                  formData.append("_id", data._id);
-                  formData.append("imageName", data.imageName);
-                  mutate(formData, {
+                  const result = createFormData({
+                    ...dataForm,
+                    image: file[0],
+                    _id: data._id,
+                    imageName: data.imageName,
+                  });
+                  mutate(result, {
                     onSuccess: () => {
+                      dispatch(showMessageSuccesss("Chỉnh sửa thành công!"));
                       setIsEdit(false);
                       refetch();
+                    },
+                    onError: () => {
+                      dispatch(showMessageError("Chỉnh sửa thất bại!"));
                     },
                   });
                   reset();
@@ -155,40 +168,41 @@ const CategoryDetail = () => {
             </button>
           )}
         </div>
-        <div className="font-semibold">
-          Sản phẩm liên quan
-          <div>
-            {Array.from({ length: 3 })
-              .fill("1")
-              .map((item) => {
+        <div className="font-semibold w-2/3">
+          <div className="text-[24px]"> Sản phẩm liên quan</div>
+          {dataListproduct?.data?.length > 0 ? (
+            <div>
+              {dataListproduct.data.map((item) => {
                 return (
-                  <div key={item}>
+                  <div key={item} className="mt-2 min-h-[140px]">
                     <CardHoriCmp
-                      text={
-                        "Đây là một phương thức của mongoose (thư viện JavaScript cho MongoDB)"
-                      }
-                      img={img}
-                      title={
-                        "Đây là một phương thức của mongoose (thư viện JavaScript cho MongoDB)"
-                      }
+                      text={item?.productName}
+                      img={item?.image}
+                      title={item?.description}
                     />
                   </div>
                 );
               })}
-          </div>
-          <div className="flex justify-center">
-            <Typography>Page: {page}</Typography>
-            <Pagination
-              count={10}
-              page={page}
-              onChange={handleChange}
-              variant="outlined"
-              shape="rounded"
-            />
-          </div>
+              <div className="flex justify-center">
+                <Pagination
+                  count={totalPage ?? 0}
+                  page={page}
+                  onChange={handleChange}
+                  variant="outlined"
+                  shape="rounded"
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="mt-20 flex text-gray-500">
+              Không có sản phẩm nào trong danh mục{" "}
+            </div>
+          )}
         </div>
       </div>
-      <CommonLoadingModal isLoadingModalOpen={isLoadingMethod} />
+      <CommonLoadingModal
+        isLoadingModalOpen={isLoadingMethod || isLoadingListproduct}
+      />
     </>
   );
 };

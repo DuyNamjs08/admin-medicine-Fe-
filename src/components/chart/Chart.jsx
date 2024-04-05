@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -65,26 +66,32 @@ const labels = [
   "Tháng 12",
 ];
 
-export const data = {
-  labels,
-  datasets: [
-    {
-      label: "Số đơn hàng",
-      data: [1, 2, 3, 0, 0, 0, 9, 0, 8, 0, 12, 87],
-      borderColor: "rgb(255, 99, 132)",
-      backgroundColor: "rgba(255, 99, 132, 0.5)",
-      yAxisID: "y",
-    },
-    {
-      label: "Số giao dịch",
-      data: [1, 2, 3, 0, 0, 0, 9, 0, 8, 0, 12, 87],
-      borderColor: "rgb(53, 162, 235)",
-      backgroundColor: "rgba(53, 162, 235, 0.5)",
-      yAxisID: "y1",
-    },
-  ],
-};
-
-export function ChartCmp() {
+export function ChartCmp({ dataUser, dataOrder, dataTransaction }) {
+  const data = {
+    labels,
+    datasets: [
+      {
+        label: "Số người đăng kí",
+        data: dataUser ? dataUser.map((item) => item.count) : [],
+        borderColor: "rgb(99, 99, 132)",
+        backgroundColor: "rgba(99, 99, 132, 0.5)",
+        yAxisID: "y",
+      },
+      {
+        label: "Số đơn hàng",
+        data: dataOrder ? dataOrder.map((item) => item.count) : [],
+        borderColor: "rgb(255, 99, 132)",
+        backgroundColor: "rgba(255, 99, 132, 0.5)",
+        yAxisID: "y",
+      },
+      {
+        label: "Số giao dịch",
+        data: dataTransaction ? dataTransaction.map((item) => item.count) : [],
+        borderColor: "rgb(53, 162, 235)",
+        backgroundColor: "rgba(53, 162, 235, 0.5)",
+        yAxisID: "y1",
+      },
+    ],
+  };
   return <Line options={options} data={data} />;
 }

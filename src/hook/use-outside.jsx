@@ -11,7 +11,6 @@ export const useOnOutsideClick = (handleOutsideClick) => {
       handleOutsideClick();
     }
   };
-
   useMountEffect(() => {
     document.addEventListener("click", onClick, true);
     return () => {
