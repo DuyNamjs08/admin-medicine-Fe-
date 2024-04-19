@@ -48,6 +48,7 @@ const ProductDetail = () => {
   const location = useLocation();
   const [isEdit, setIsEdit] = useState(false);
   const [file, setFile] = useState([]);
+  const [fileOld, setFileOld] = useState([]);
   const {
     data: dataProductId,
     refetch,
@@ -55,13 +56,15 @@ const ProductDetail = () => {
   } = useProductId(location.pathname.split("/")[2]);
   const [isLoadingMethod, setIsLoadingMethod] = useState(false);
   const { data, isLoading: isisLoadingCategory } = useCategory();
-  const { data: dataListproduct, isLoading: isLoadingListproduct } = useProduct(
-    {
-      category_id: location.search.split("=")[1],
-      limit: defaultLimit.limit,
-      offset: 0,
-    }
-  );
+  const {
+    data: dataListproduct,
+    isLoading: isLoadingListproduct,
+    refetch: refetchListProduct,
+  } = useProduct({
+    category_id: location.search.split("=")[1],
+    limit: defaultLimit.limit,
+    offset: 0,
+  });
   const { mutate, status } = useProductUpdate();
   const handleDelete = (index) => {
     const updatedImages = file.filter((img, i) => i !== index);
@@ -81,6 +84,7 @@ const ProductDetail = () => {
       setValue("size", dataProductId?.size || "");
       setValue("color", dataProductId?.color || "");
       setValue("description", dataProductId?.description || "");
+      setFileOld(dataProductId.image.split(","));
     }
   }, [dataProductId]);
   useEffect(() => {
@@ -96,7 +100,7 @@ const ProductDetail = () => {
       {isEdit ? (
         <button
           onClick={handleSubmit(async (dataForm) => {
-            if (file && isEdit) {
+            if (isEdit) {
               const result = createFormData({
                 ...dataForm,
                 _id: dataProductId._id,
@@ -108,6 +112,7 @@ const ProductDetail = () => {
                   dispatch(showMessageSuccesss("Chỉnh sửa thành công!"));
                   setIsEdit(false);
                   refetch();
+                  refetchListProduct();
                 },
                 onError: () => {
                   dispatch(showMessageError("Chỉnh sửa thất bại!"));
@@ -267,6 +272,17 @@ const ProductDetail = () => {
                   </button>
                 </div>
               ))}
+              {fileOld.length > 0 &&
+                file.length === 0 &&
+                fileOld.map((image, index) => (
+                  <div key={index}>
+                    <img
+                      src={image}
+                      alt={`Image ${index}`}
+                      className="max-w-[200px] mb-2"
+                    />
+                  </div>
+                ))}
             </div>
           </div>
         </div>
