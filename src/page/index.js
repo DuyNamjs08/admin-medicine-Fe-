@@ -36,6 +36,8 @@ import AccountOutlet from "./account/AccountOutlet";
 import TransacOulet from "./transaction/TransacOulet";
 import TransacPage from "./transaction/TransacPage";
 import TransacDetail from "./transaction/TransacDetail";
+// chat
+import Chat from "./chat/Chat";
 
 export default {
   MapPage,
@@ -76,4 +78,6 @@ export default {
   TransacOulet,
   TransacPage,
   TransacDetail,
+  // Chat
+  Chat,
 };

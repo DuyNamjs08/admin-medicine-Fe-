@@ -34,7 +34,9 @@ const ProductTable = ({ data, mutate, refetch, dataCategory }) => {
                     : ""}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                  {format(new Date(item.createdAt), "dd-MM-yyyy")}
+                  {item?.createdAt
+                    ? format(new Date(item?.createdAt), "dd-MM-yyyy")
+                    : ""}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                   <img

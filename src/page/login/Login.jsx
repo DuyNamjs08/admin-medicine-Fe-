@@ -11,8 +11,10 @@ import { loginSchema } from "./loginSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useLoginPost } from "../../useQuery/useLogin";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import {
   resetMessage,
   showMessageError,
@@ -29,23 +31,12 @@ export default function Login() {
   const message = useSelector((state) => state.home.message);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
   const { register, handleSubmit, reset } = useForm({
     resolver: zodResolver(loginSchema),
     mode: "onSubmit",
   });
-  const { data, mutate } = useLoginPost();
-  useEffect(() => {
-    const cb = async () => {
-      if (data) {
-        await localStorage.setItem("accessToken", data.accessToken);
-        await localStorage.setItem("refreshToken", data.refreshToken[0]);
-        await localStorage.setItem("mail", data.mail);
-        await localStorage.setItem("userId", data.user);
-        await navigate("/");
-      }
-    };
-    cb();
-  }, [data]);
+  const { mutate } = useLoginPost();
   useEffect(() => {
     let timeoutId;
     if (showMess) {
@@ -57,6 +48,7 @@ export default function Login() {
       clearTimeout(timeoutId);
     };
   }, [showMess]);
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
   return (
     <>
       <ThemeProvider theme={defaultTheme}>
@@ -80,8 +72,25 @@ export default function Login() {
               component="form"
               onSubmit={handleSubmit((data) => {
                 mutate(data, {
-                  onSuccess: () => {
-                    dispatch(showMessageSuccesss("Đăng nhập thành công!"));
+                  onSuccess: async (data) => {
+                    if (data.role === import.meta.env.VITE_ADMIN) {
+                      await localStorage.setItem(
+                        "accessToken",
+                        data.accessToken
+                      );
+                      await localStorage.setItem(
+                        "refreshToken",
+                        data.refreshToken[0]
+                      );
+                      await localStorage.setItem("mail", data.mail);
+                      await localStorage.setItem("userId", data.user);
+                      dispatch(showMessageSuccesss("Đăng nhập thành công!"));
+                      await navigate("/");
+                    } else {
+                      dispatch(
+                        showMessageError("Tài khoản của bạn ko có quyền !")
+                      );
+                    }
                     reset();
                   },
                   onError: () => {
@@ -103,17 +112,26 @@ export default function Login() {
                 autoFocus
                 {...register("mail")}
               />
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                {...register("password")}
-                name="password"
-                label="Nhập mật khẩu"
-                type="password"
-                id="password"
-                autoComplete="current-password"
-              />
+              <div className="relative w-[340px]">
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  {...register("password")}
+                  name="password"
+                  label="Nhập mật khẩu"
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  autoComplete="current-password"
+                />
+                <div
+                  onClick={handleClickShowPassword}
+                  className="absolute top-[30px] right-[10px] cursor-pointer"
+                >
+                  {" "}
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </div>
+              </div>
 
               <Button
                 type="submit"

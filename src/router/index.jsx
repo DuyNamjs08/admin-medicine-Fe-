@@ -9,6 +9,7 @@ const CHAN_TRANG = "/chan-trang";
 const DANH_MUC = "/danh-muc";
 const TAI_KHOAN = "/tai-khoan";
 const GIAO_DICH = "/giao-dich";
+const CHAT = "/chat";
 
 const RouterWeb = [
   {
@@ -16,6 +17,12 @@ const RouterWeb = [
     path: TRANG_CHU,
     role: ["1", "2", "3"],
     component: <Pages.MapPage />,
+  },
+  {
+    id: 312311,
+    path: CHAT,
+    role: ["1", "2", "3"],
+    component: <Pages.Chat />,
   },
   {
     id: 414316,

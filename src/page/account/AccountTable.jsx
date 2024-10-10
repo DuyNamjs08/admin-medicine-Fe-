@@ -27,7 +27,7 @@ const AccountTable = ({ data, mutate, refetch, refetchUser }) => {
                     {item._id}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                    {item.name}
+                    {item?.name}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-red-800 font-semibold">
                     {item?.role
@@ -37,7 +37,9 @@ const AccountTable = ({ data, mutate, refetch, refetchUser }) => {
                       : ""}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                    {format(new Date(item.createdAt), "dd-MM-yyyy")}
+                    {item?.createdAt
+                      ? format(new Date(item?.createdAt), "dd-MM-yyyy")
+                      : ""}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                     <img
