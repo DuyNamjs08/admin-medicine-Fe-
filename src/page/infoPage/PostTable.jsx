@@ -34,6 +34,7 @@ const PostTable = ({ data, mutate, refetch }) => {
                         mutate(
                           {
                             _id: item._id,
+                            imageName: item.imageName,
                           },
                           {
                             onSuccess: () => {

@@ -23,7 +23,7 @@ export const usePosts = () => {
   return { data, isLoading, error, status, refetch };
 };
 const fetchDataPost = async (data) => {
-  const headers = getHeaders("json");
+  const headers = getHeaders();
   try {
     const result = await axios.post(
       `${import.meta.env.VITE_BASE_URL}/posts`,
